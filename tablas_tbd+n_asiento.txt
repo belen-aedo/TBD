@@ -1,0 +1,107 @@
+-- Crear tabla COMPANIA (tabla padre)
+CREATE TABLE COMPANIA (
+    compania_id SERIAL PRIMARY KEY,
+    nombre VARCHAR(20) NOT NULL
+);
+
+-- Crear tabla MODELO
+CREATE TABLE MODELO (
+    id_modelo SERIAL PRIMARY KEY,
+    nombre_modelo VARCHAR(100) NOT NULL
+);
+
+-- Crear tabla PASAJE
+CREATE TABLE PASAJE (
+    id_pasaje SERIAL PRIMARY KEY,
+    tipo_seccion VARCHAR(20) NOT NULL CHECK (tipo_seccion IN ('economy', 'economy_premium', 'business', 'first_class')),
+    numero_asiento INT NOT NULL 
+);
+
+-- Crear tabla SECCION
+CREATE TABLE SECCION (
+    id_seccion SERIAL PRIMARY KEY,
+    tipo_seccion VARCHAR(20) NOT NULL CHECK (tipo_seccion IN ('economy', 'economy_premium', 'business', 'first_class'))
+);
+
+-- Crear tabla CLIENTE
+CREATE TABLE CLIENTE (
+    nro_documento INT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    nacionalidad VARCHAR(30) NOT NULL,
+    compania_id INT NOT NULL,
+    FOREIGN KEY (compania_id) REFERENCES COMPANIA(compania_id)
+);
+
+-- Crear tabla AVION
+CREATE TABLE AVION (
+    id_avion SERIAL PRIMARY KEY,
+    anio_avion DATE NOT NULL,
+    material_avion VARCHAR(20) NOT NULL,
+    cantidad_pasajeros INT NOT NULL CHECK (cantidad_pasajeros > 0),
+    id_modelo INT NOT NULL,
+    compania_id INT NOT NULL,
+    FOREIGN KEY (id_modelo) REFERENCES MODELO(id_modelo),
+    FOREIGN KEY (compania_id) REFERENCES COMPANIA(compania_id)
+);
+
+-- Crear tabla EMPLEADO
+CREATE TABLE EMPLEADO (
+    rut_e INT PRIMARY KEY,
+    celular INT NOT NULL,
+    nombre_e VARCHAR(20) NOT NULL,
+    apellido_e VARCHAR(20) NOT NULL,
+    correo VARCHAR(50) NOT NULL UNIQUE,
+    sobrecargo BOOLEAN NOT NULL DEFAULT FALSE,
+    auxiliar_de_vuelo BOOLEAN NOT NULL DEFAULT FALSE,
+    compania_id INT NOT NULL,
+    FOREIGN KEY (compania_id) REFERENCES COMPANIA(compania_id)
+);
+
+-- Crear tabla VUELO
+CREATE TABLE VUELO (
+    id_vuelo SERIAL PRIMARY KEY,
+    origen VARCHAR(20) NOT NULL,
+    destino VARCHAR(20) NOT NULL,
+    fecha_vuelo TIMESTAMPTZ NOT NULL,
+    id_avion INT NOT NULL,
+    compania_id INT NOT NULL,
+    FOREIGN KEY (id_avion) REFERENCES AVION(id_avion),
+    FOREIGN KEY (compania_id) REFERENCES COMPANIA(compania_id)
+);
+
+-- Crear tabla CLIENTE_COMP
+CREATE TABLE CLIENTE_COMP (
+    compa_id SERIAL PRIMARY KEY,
+    nro_documento INT NOT NULL,
+    vuelo_id INT NOT NULL,
+    FOREIGN KEY (nro_documento) REFERENCES CLIENTE(nro_documento),
+    FOREIGN KEY (vuelo_id) REFERENCES VUELO(id_vuelo)
+);
+
+-- Crear tabla COSTO
+CREATE TABLE COSTO (
+    id_costo SERIAL PRIMARY KEY,
+    nombre_costo VARCHAR(50) NOT NULL,
+    monto_costo DECIMAL(10,2) NOT NULL CHECK (monto_costo >= 0),
+    id_pasaje INT NOT NULL,
+    FOREIGN KEY (id_pasaje) REFERENCES PASAJE(id_pasaje)
+);
+
+-- Crear tabla SUELDO
+CREATE TABLE SUELDO (
+    id_sueldo SERIAL PRIMARY KEY,
+    fecha_pago DATE NOT NULL,
+    monto_pago DECIMAL(10,2) NOT NULL CHECK (monto_pago >= 0),
+    rut_e INT NOT NULL,
+    FOREIGN KEY (rut_e) REFERENCES EMPLEADO(rut_e)
+);
+
+-- Crear tabla EMP_VUELO (tabla de relación muchos a muchos)
+CREATE TABLE EMP_VUELO (
+    id_emp_vuelo SERIAL PRIMARY KEY,
+    vuelo_id INT NOT NULL,
+    rut_e INT NOT NULL,
+    FOREIGN KEY (vuelo_id) REFERENCES VUELO(id_vuelo),
+    FOREIGN KEY (rut_e) REFERENCES EMPLEADO(rut_e)
+);
