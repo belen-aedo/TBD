@@ -10,12 +10,23 @@ CREATE TABLE MODELO (
     nombre_modelo VARCHAR(100) NOT NULL
 );
 
--- Crear tabla PASAJE
+-- Tabla PASAJE
 CREATE TABLE PASAJE (
-    id_pasaje SERIAL PRIMARY KEY,
-    tipo_seccion VARCHAR(20) NOT NULL CHECK (tipo_seccion IN ('economy', 'economy_premium', 'business', 'first_class')),
-    numero_asiento INT NOT NULL 
+    id_pasaje INT PRIMARY KEY, -- Identificador del pasaje
+    nro_asiento VARCHAR(20) NOT NULL, -- Tipo de sección (economy, economy_premium, business, first class)
+    hora_embarque VARCHAR(20) NOT NULL, -- Hora del embarque
+    lugar_destino VARCHAR(20) NOT NULL, -- Destino del viaje
+    puerta VARCHAR(20) NOT NULL, -- Puerta donde abordar
+    numero_asiento INT NOT NULL, -- Número de asiento del avión
+    id_seccion INT, -- Relación con tabla SECCION
+    nro_documento INT, -- Relación con tabla CLIENTE
+    vuelo_id INT, -- Relación con tabla VUELO
+
+    FOREIGN KEY (id_seccion) REFERENCES SECCION(id_seccion), -- FK a SECCION
+    FOREIGN KEY (nro_documento) REFERENCES CLIENTE(nro_documento), -- FK a CLIENTE
+    FOREIGN KEY (vuelo_id) REFERENCES VUELO(vuelo_id) -- FK a VUELO
 );
+
 
 -- Crear tabla SECCION
 CREATE TABLE SECCION (
