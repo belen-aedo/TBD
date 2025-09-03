@@ -45,9 +45,12 @@ CREATE TABLE EMPLEADO (
     sobrecargo BOOLEAN NOT NULL DEFAULT FALSE,
     auxiliar_de_vuelo BOOLEAN NOT NULL DEFAULT FALSE,
     compania_id INT NOT NULL,
-    FOREIGN KEY (compania_id) REFERENCES COMPANIA(compania_id)
+    FOREIGN KEY (compania_id) REFERENCES COMPANIA(compania_id),
+    CONSTRAINT chk_cargo_empleado CHECK (
+        (sobrecargo = TRUE AND auxiliar_de_vuelo = FALSE) OR 
+        (sobrecargo = FALSE AND auxiliar_de_vuelo = TRUE)
+    )
 );
-
 -- 4) VUELO (requiere AVION y COMPANIA)
 CREATE TABLE VUELO (
     id_vuelo SERIAL PRIMARY KEY,
