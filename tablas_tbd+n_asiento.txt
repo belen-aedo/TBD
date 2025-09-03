@@ -17,7 +17,7 @@ CREATE TABLE SECCION (
 
 -- 3) Tablas que dependen solo de COMPANIA
 CREATE TABLE CLIENTE (
-    nro_documento INT PRIMARY KEY,
+    nro_documento VARCHAR(10) PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
     nacionalidad VARCHAR(30) NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE AVION (
 );
 
 CREATE TABLE EMPLEADO (
-    rut_e INT PRIMARY KEY,
+    rut_e VARCHAR(10) PRIMARY KEY,
     celular INT NOT NULL,
     nombre_e VARCHAR(20) NOT NULL,
     apellido_e VARCHAR(20) NOT NULL,
@@ -66,13 +66,12 @@ CREATE TABLE VUELO (
 -- 5) PASAJE (requiere SECCION, CLIENTE, VUELO)
 CREATE TABLE PASAJE (
     id_pasaje INT PRIMARY KEY,
-    nro_asiento VARCHAR(20) NOT NULL,
     hora_embarque VARCHAR(20) NOT NULL,
     lugar_destino VARCHAR(20) NOT NULL,
     puerta VARCHAR(20) NOT NULL,
     numero_asiento INT NOT NULL,
     id_seccion INT,
-    nro_documento INT,
+    nro_documento VARCHAR(10),
     vuelo_id INT,
     FOREIGN KEY (id_seccion) REFERENCES SECCION(id_seccion),
     FOREIGN KEY (nro_documento) REFERENCES CLIENTE(nro_documento),
@@ -82,7 +81,7 @@ CREATE TABLE PASAJE (
 -- 6) CLIENTE_COMP (requiere CLIENTE y VUELO)
 CREATE TABLE CLIENTE_COMP (
     compa_id SERIAL PRIMARY KEY,
-    nro_documento INT NOT NULL,
+    nro_documento VARCHAR(10) NOT NULL,
     vuelo_id INT NOT NULL,
     FOREIGN KEY (nro_documento) REFERENCES CLIENTE(nro_documento),
     FOREIGN KEY (vuelo_id) REFERENCES VUELO(id_vuelo)
@@ -102,7 +101,7 @@ CREATE TABLE SUELDO (
     id_sueldo SERIAL PRIMARY KEY,
     fecha_pago DATE NOT NULL,
     monto_pago DECIMAL(10,2) NOT NULL CHECK (monto_pago >= 0),
-    rut_e INT NOT NULL,
+    rut_e VARCHAR(10) NOT NULL,
     FOREIGN KEY (rut_e) REFERENCES EMPLEADO(rut_e)
 );
 
@@ -110,7 +109,7 @@ CREATE TABLE SUELDO (
 CREATE TABLE EMP_VUELO (
     id_emp_vuelo SERIAL PRIMARY KEY,
     vuelo_id INT NOT NULL,
-    rut_e INT NOT NULL,
+    rut_e VARCHAR(10) NOT NULL,
     FOREIGN KEY (vuelo_id) REFERENCES VUELO(id_vuelo),
     FOREIGN KEY (rut_e) REFERENCES EMPLEADO(rut_e)
 );
