@@ -26,7 +26,7 @@ WHERE c.nacionalidad = 'Argentina'
 GROUP BY s.tipo_seccion
 ORDER BY num_compras DESC;
 
---7) Lista de compañías indicando cuál es el avión que más ha recaudado en los últimos 
+-- 7) Lista de compañías indicando cuál es el avión que más ha recaudado en los últimos 
 4 años y cuál es el monto recaudado.
 
 SELECT 
@@ -57,7 +57,7 @@ HAVING SUM(co.monto_costo) = (
 )
 ORDER BY "Monto Recaudado" DESC;
 
--- 8)Lista de compañías y total de aviones por año (en los últimos 10 años).
+-- 8) Lista de compañías y total de aviones por año (en los últimos 10 años).
 
 SELECT 
     c.nombre AS compania,
