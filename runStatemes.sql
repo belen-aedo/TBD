@@ -26,6 +26,48 @@ WHERE c.nacionalidad = 'Argentina'
 GROUP BY s.tipo_seccion
 ORDER BY num_compras DESC;
 
+--7) Lista de compañías indicando cuál es el avión que más ha recaudado en los últimos 
+4 años y cuál es el monto recaudado.
+
+SELECT 
+    c.nombre AS "Compañía",
+    a.id_avion AS "ID Avión", 
+    m.nombre_modelo AS "Modelo",
+    SUM(co.monto_costo) AS "Monto Recaudado"
+FROM COMPANIA c
+JOIN AVION a ON c.compania_id = a.compania_id
+JOIN MODELO m ON a.id_modelo = m.id_modelo
+JOIN VUELO v ON a.id_avion = v.id_avion
+JOIN PASAJE p ON v.id_vuelo = p.vuelo_id
+JOIN COSTO co ON p.id_pasaje = co.id_pasaje
+WHERE v.fecha_vuelo >= CURRENT_DATE - INTERVAL '4 years'
+GROUP BY c.compania_id, c.nombre, a.id_avion, m.nombre_modelo
+HAVING SUM(co.monto_costo) = (
+    SELECT MAX(recaudacion)
+    FROM (
+        SELECT SUM(co2.monto_costo) as recaudacion
+        FROM AVION a2
+        JOIN VUELO v2 ON a2.id_avion = v2.id_avion
+        JOIN PASAJE p2 ON v2.id_vuelo = p2.vuelo_id
+        JOIN COSTO co2 ON p2.id_pasaje = co2.id_pasaje
+        WHERE a2.compania_id = c.compania_id
+          AND v2.fecha_vuelo >= CURRENT_DATE - INTERVAL '4 years'
+        GROUP BY a2.id_avion
+    ) 
+)
+ORDER BY "Monto Recaudado" DESC;
+
+-- 8)Lista de compañías y total de aviones por año (en los últimos 10 años).
+
+SELECT 
+    c.nombre AS compania,
+    EXTRACT(YEAR FROM a.anio_avion) AS año,
+    COUNT(a.id_avion) AS total_aviones
+FROM COMPANIA c
+JOIN AVION a ON c.compania_id = a.compania_id
+WHERE a.anio_avion >= CURRENT_DATE - INTERVAL '10 years'
+GROUP BY c.nombre, EXTRACT(YEAR FROM a.anio_avion)
+ORDER BY c.nombre, año DESC;
 
 
 -- 9) Lista anual de compañias que en promedio han pagado más a sus empleados (últimos 10 años)
