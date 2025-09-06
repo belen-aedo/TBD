@@ -26,6 +26,43 @@ WHERE c.nacionalidad = 'Argentina'
 GROUP BY s.tipo_seccion
 ORDER BY num_compras DESC;
 
+
+-- 3) Lista mensual de países que más gastan en volar (durante los últimos 4 años).
+
+SELECT
+    EXTRACT(YEAR FROM v.fecha_vuelo) AS anio,
+    EXTRACT(MONTH FROM v.fecha_vuelo) AS mes,
+    c.nacionalidad AS pais,
+    SUM(co.monto_costo) AS total_gastado
+FROM COSTO co
+JOIN PASAJE p ON co.id_pasaje = p.id_pasaje
+JOIN CLIENTE c ON p.nro_documento = c.nro_documento
+JOIN VUELO v ON p.vuelo_id = v.id_vuelo
+WHERE v.fecha_vuelo >= CURRENT_DATE - INTERVAL '4 years'
+GROUP BY anio, mes, pais
+ORDER BY anio, mes, total_gastado DESC;
+
+
+-- 4) Lista de pasajeros que viajan en “First Class” más de 4 veces al mes.
+
+SELECT
+    c.nro_documento,
+    c.nombre,
+    c.apellido,
+    EXTRACT(YEAR FROM v.fecha_vuelo) AS anio,
+    EXTRACT(MONTH FROM v.fecha_vuelo) AS mes,
+    COUNT(*) AS total_vuelos_first_class
+FROM CLIENTE c
+JOIN PASAJE p ON c.nro_documento = p.nro_documento
+JOIN SECCION s ON p.id_seccion = s.id_seccion
+JOIN VUELO v ON p.vuelo_id = v.id_vuelo
+WHERE s.tipo_seccion = 'first_class'
+GROUP BY c.nro_documento, c.nombre, c.apellido, anio, mes
+HAVING COUNT(*) > 4
+ORDER BY anio DESC, mes DESC, total_vuelos_first_class DESC;
+
+
+
 -- 7) Lista de compañías indicando cuál es el avión que más ha recaudado en los últimos 
 4 años y cuál es el monto recaudado.
 
