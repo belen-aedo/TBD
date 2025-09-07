@@ -107,8 +107,8 @@ SELECT
     e.nombre_e,
     e.apellido_e,
     CASE 
-        WHEN e.sobrecargo = TRUE THEN 'Sobrecargo/Piloto'
-        WHEN e.auxiliar_de_vuelo = TRUE THEN 'Auxiliar de Vuelo'
+        WHEN e.sobrecargo = TRUE THEN 'Sobrecargo'
+        WHEN e.piloto = TRUE THEN 'Piloto'
         ELSE 'Otro'
     END AS tipo_empleado,
     c.nombre AS compania,
