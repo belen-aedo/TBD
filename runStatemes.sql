@@ -29,18 +29,33 @@ ORDER BY num_compras DESC;
 
 -- 3) Lista mensual de países que más gastan en volar (durante los últimos 4 años).
 
-SELECT
-    EXTRACT(YEAR FROM v.fecha_vuelo) AS anio,
-    EXTRACT(MONTH FROM v.fecha_vuelo) AS mes,
-    c.nacionalidad AS pais,
-    SUM(co.monto_costo) AS total_gastado
-FROM COSTO co
-JOIN PASAJE p ON co.id_pasaje = p.id_pasaje
-JOIN CLIENTE c ON p.nro_documento = c.nro_documento
-JOIN VUELO v ON p.vuelo_id = v.id_vuelo
-WHERE v.fecha_vuelo >= CURRENT_DATE - INTERVAL '4 years'
-GROUP BY anio, mes, pais
-ORDER BY anio, mes, total_gastado DESC;
+WITH country_month_spending AS (
+    SELECT 
+        EXTRACT(YEAR FROM v.fecha_vuelo) AS anio,
+        EXTRACT(MONTH FROM v.fecha_vuelo) AS mes,
+        c.nacionalidad AS pais,
+        SUM(co.monto_costo) AS total_gastado
+    FROM COSTO co
+    JOIN PASAJE p ON co.id_pasaje = p.id_pasaje
+    JOIN CLIENTE c ON p.nro_documento = c.nro_documento
+    JOIN VUELO v ON p.vuelo_id = v.id_vuelo
+    WHERE v.fecha_vuelo >= CURRENT_DATE - INTERVAL '4 years'
+    GROUP BY anio, mes, pais
+),
+ranked_country_spending AS (
+    SELECT 
+        cms.*,
+        RANK() OVER (PARTITION BY cms.anio, cms.mes ORDER BY cms.total_gastado DESC) AS rank
+    FROM country_month_spending cms
+)
+SELECT 
+    anio,
+    mes,
+    pais,
+    total_gastado
+FROM ranked_country_spending
+WHERE rank = 1
+ORDER BY anio, mes;
 
 
 -- 4) Lista de pasajeros que viajan en “First Class” más de 4 veces al mes.
