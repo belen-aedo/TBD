@@ -141,7 +141,7 @@ INSERT INTO CLIENTE (nro_documento, nombre, apellido, nacionalidad, compania_id)
 ('30000099-9', 'Nicolás', 'Flores', 'Mexicana', 5);
 
 -- ============================
-INSERT INTO EMPLEADO (rut_e, celular, nombre_e, apellido_e, correo, sobrecargo, auxiliar_de_vuelo, compania_id) VALUES
+INSERT INTO EMPLEADO (rut_e, celular, nombre_e, apellido_e, correo, sobrecargo, piloto, compania_id) VALUES
 ('16000050-6', 987600050, 'Camila', 'Silva', 'camila.silva.2@latam.com', TRUE, FALSE, 1),
 ('16000051-4', 987600051, 'Felipe', 'Ortega', 'felipe.ortega.2@sky.com', FALSE, TRUE, 2),
 ('16000052-2', 987600052, 'Valentina', 'Cáceres', 'valentina.caceres.2@jetsmart.com', TRUE, FALSE, 3),
