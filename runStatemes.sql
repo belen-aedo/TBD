@@ -61,6 +61,29 @@ GROUP BY c.nro_documento, c.nombre, c.apellido, anio, mes
 HAVING COUNT(*) > 4
 ORDER BY anio DESC, mes DESC, total_vuelos_first_class DESC;
 
+-- 5) Avión con menos vuelos
+
+SELECT 
+    a.id_avion,
+    m.nombre_modelo AS modelo,
+    c.nombre AS compania,
+    COUNT(v.id_vuelo) AS cantidad_vuelos
+FROM AVION a
+JOIN MODELO m ON a.id_modelo = m.id_modelo
+JOIN COMPANIA c ON a.compania_id = c.compania_id
+LEFT JOIN VUELO v ON a.id_avion = v.id_avion
+GROUP BY a.id_avion, m.nombre_modelo, c.nombre
+HAVING COUNT(v.id_vuelo) = (
+    SELECT MIN(vuelo_count)
+    FROM (
+        SELECT COUNT(v2.id_vuelo) as vuelo_count
+        FROM AVION a2
+        LEFT JOIN VUELO v2 ON a2.id_avion = v2.id_avion
+        GROUP BY a2.id_avion
+    ) AS subquery
+)
+ORDER BY a.id_avion;
+
 
 
 -- 7) Lista de compañías indicando cuál es el avión que más ha recaudado en los últimos 
