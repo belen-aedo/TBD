@@ -43,12 +43,12 @@ CREATE TABLE EMPLEADO (
     apellido_e VARCHAR(20) NOT NULL,
     correo VARCHAR(50) NOT NULL UNIQUE,
     sobrecargo BOOLEAN NOT NULL DEFAULT FALSE,
-    auxiliar_de_vuelo BOOLEAN NOT NULL DEFAULT FALSE,
+    piloto BOOLEAN NOT NULL DEFAULT FALSE,
     compania_id INT NOT NULL,
     FOREIGN KEY (compania_id) REFERENCES COMPANIA(compania_id),
     CONSTRAINT chk_cargo_empleado CHECK (
-        (sobrecargo = TRUE AND auxiliar_de_vuelo = FALSE) OR 
-        (sobrecargo = FALSE AND auxiliar_de_vuelo = TRUE)
+        (sobrecargo = TRUE AND piloto = FALSE) OR 
+        (sobrecargo = FALSE AND piloto = TRUE)
     )
 );
 -- 4) VUELO (requiere AVION y COMPANIA)
