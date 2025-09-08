@@ -60,21 +60,28 @@ ORDER BY anio, mes;
 
 -- 4) Lista de pasajeros que viajan en “First Class” más de 4 veces al mes.
 
-SELECT
-    c.nro_documento,
-    c.nombre,
-    c.apellido,
-    EXTRACT(YEAR FROM v.fecha_vuelo) AS anio,
-    EXTRACT(MONTH FROM v.fecha_vuelo) AS mes,
-    COUNT(*) AS total_vuelos_first_class
-FROM CLIENTE c
-JOIN PASAJE p ON c.nro_documento = p.nro_documento
-JOIN SECCION s ON p.id_seccion = s.id_seccion
-JOIN VUELO v ON p.vuelo_id = v.id_vuelo
-WHERE s.tipo_seccion = 'first_class'
-GROUP BY c.nro_documento, c.nombre, c.apellido, anio, mes
-HAVING COUNT(*) > 4
-ORDER BY anio DESC, mes DESC, total_vuelos_first_class DESC;
+SELECT 
+    EXTRACT(YEAR FROM s.fecha_pago) AS año,
+    EXTRACT(MONTH FROM s.fecha_pago) AS mes,
+    e.nombre_e,
+    e.apellido_e,
+    c.nombre AS compania,
+    s.monto_pago
+FROM SUELDO s
+JOIN EMPLEADO e ON s.rut_e = e.rut_e
+JOIN COMPANIA c ON e.compania_id = c.compania_id
+WHERE e.piloto = TRUE
+  AND s.fecha_pago >= CURRENT_DATE - INTERVAL '4 years'
+  AND s.monto_pago = (
+      SELECT MAX(s2.monto_pago)
+      FROM SUELDO s2
+      JOIN EMPLEADO e2 ON s2.rut_e = e2.rut_e
+      WHERE e2.piloto = TRUE
+        AND EXTRACT(YEAR FROM s2.fecha_pago) = EXTRACT(YEAR FROM s.fecha_pago)
+        AND EXTRACT(MONTH FROM s2.fecha_pago) = EXTRACT(MONTH FROM s.fecha_pago)
+        AND s2.fecha_pago >= CURRENT_DATE - INTERVAL '4 years'
+  )
+ORDER BY año DESC, mes DESC;
 
 -- 5) Avión con menos vuelos
 
