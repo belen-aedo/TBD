@@ -108,31 +108,36 @@ ORDER BY a.id_avion;
 
 -- 6) Lista mensual de empleados con mayor sueldo durante los últimos 4 años
 
+-- 6) Lista mensual de empleados con mayor sueldo durante los últimos 4 años
 SELECT 
-    EXTRACT(YEAR FROM s.fecha_pago) AS año,
-    EXTRACT(MONTH FROM s.fecha_pago) AS mes,
+    años.año,
+    meses.mes,
     e.nombre_e,
     e.apellido_e,
-    CASE 
-        WHEN e.sobrecargo = TRUE THEN 'Sobrecargo'
-        WHEN e.piloto = TRUE THEN 'Piloto'
-        ELSE 'Otro'
-    END AS tipo_empleado,
     c.nombre AS compania,
     s.monto_pago
-FROM SUELDO s
-JOIN EMPLEADO e ON s.rut_e = e.rut_e
-JOIN COMPANIA c ON e.compania_id = c.compania_id
-WHERE s.fecha_pago >= CURRENT_DATE - INTERVAL '4 years'
-  AND s.monto_pago = (
-      -- Encuentra el sueldo máximo para cada mes/año
-      SELECT MAX(s2.monto_pago)
-      FROM SUELDO s2
-      WHERE EXTRACT(YEAR FROM s2.fecha_pago) = EXTRACT(YEAR FROM s.fecha_pago)
-        AND EXTRACT(MONTH FROM s2.fecha_pago) = EXTRACT(MONTH FROM s.fecha_pago)
-        AND s2.fecha_pago >= CURRENT_DATE - INTERVAL '4 years'
-  )
-ORDER BY año DESC, mes DESC;
+FROM (
+    SELECT EXTRACT(YEAR FROM CURRENT_DATE) - nivel AS año
+    FROM (VALUES (0), (1), (2), (3)) AS t(nivel)
+) años
+CROSS JOIN (
+    SELECT mes FROM (VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12)) AS m(mes)
+) meses
+LEFT JOIN SUELDO s ON EXTRACT(YEAR FROM s.fecha_pago) = años.año 
+                   AND EXTRACT(MONTH FROM s.fecha_pago) = meses.mes
+                   AND s.fecha_pago >= CURRENT_DATE - INTERVAL '4 years'
+LEFT JOIN EMPLEADO e ON s.rut_e = e.rut_e AND e.piloto = TRUE
+LEFT JOIN COMPANIA c ON e.compania_id = c.compania_id
+WHERE (s.monto_pago IS NULL OR s.monto_pago = (
+    SELECT MAX(s2.monto_pago)
+    FROM SUELDO s2
+    JOIN EMPLEADO e2 ON s2.rut_e = e2.rut_e
+    WHERE e2.piloto = TRUE
+      AND EXTRACT(YEAR FROM s2.fecha_pago) = años.año
+      AND EXTRACT(MONTH FROM s2.fecha_pago) = meses.mes
+      AND s2.fecha_pago >= CURRENT_DATE - INTERVAL '4 years'
+))
+ORDER BY años.año DESC, meses.mes DESC;
 
 -- 7) Lista de compañías indicando cuál es el avión que más ha recaudado en los últimos 
 4 años y cuál es el monto recaudado.
